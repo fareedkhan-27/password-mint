@@ -52,8 +52,11 @@
     const elements = {
         form: document.getElementById('passwordForm'),
         site: document.getElementById('site'),
+        siteError: document.getElementById('siteError'),
         masterPhrase: document.getElementById('masterPhrase'),
+        masterPhraseError: document.getElementById('masterPhraseError'),
         version: document.getElementById('version'),
+        versionError: document.getElementById('versionError'),
         length: document.getElementById('length'),
         lengthValue: document.getElementById('lengthValue'),
         useUpper: document.getElementById('useUpper'),
@@ -65,6 +68,8 @@
         generateBtn: document.getElementById('generateBtn'),
         outputSection: document.getElementById('outputSection'),
         generatedPassword: document.getElementById('generatedPassword'),
+        toggleOutputVisibility: document.getElementById('toggleOutputVisibility'),
+        outputEyeIcon: document.getElementById('outputEyeIcon'),
         copyBtn: document.getElementById('copyBtn'),
         copyIcon: document.getElementById('copyIcon'),
         regenerateBtn: document.getElementById('regenerateBtn'),
@@ -79,6 +84,10 @@
         autoClearNotice: document.getElementById('autoClearNotice'),
         howItWorksHeader: document.getElementById('howItWorksHeader'),
         howItWorksContent: document.getElementById('howItWorksContent'),
+        faqHeader: document.getElementById('faqHeader'),
+        faqContent: document.getElementById('faqContent'),
+        securityHeader: document.getElementById('securityHeader'),
+        securityContent: document.getElementById('securityContent'),
         advancedOptions: document.getElementById('advancedOptions'),
         copyText: document.querySelector('.copy-text')
     };
@@ -89,6 +98,46 @@
 
     let autoClearTimeout = null;
     let rememberedPhrase = null;
+
+    // =========================================================================
+    // FIELD ERROR HELPERS
+    // =========================================================================
+
+    /**
+     * Show an error message for a field.
+     * @param {HTMLInputElement} input - The input element
+     * @param {HTMLElement} errorElement - The error message container
+     * @param {string} message - The error message
+     */
+    function showFieldError(input, errorElement, message) {
+        input.classList.add('is-error');
+        input.setAttribute('aria-invalid', 'true');
+        if (errorElement) {
+            errorElement.textContent = message;
+        }
+    }
+
+    /**
+     * Clear error state from a field.
+     * @param {HTMLInputElement} input - The input element
+     * @param {HTMLElement} errorElement - The error message container
+     */
+    function clearFieldError(input, errorElement) {
+        input.classList.remove('is-error');
+        input.removeAttribute('aria-invalid');
+        if (errorElement) {
+            errorElement.textContent = '';
+        }
+    }
+
+    /**
+     * Clear all field errors.
+     */
+    function clearAllFieldErrors() {
+        clearFieldError(elements.site, elements.siteError);
+        clearFieldError(elements.masterPhrase, elements.masterPhraseError);
+        clearFieldError(elements.version, elements.versionError);
+    }
 
     // =========================================================================
     // UTILITY FUNCTIONS
@@ -452,25 +501,40 @@
         const length = parseInt(elements.length.value, 10);
         const securityLevel = elements.securityLevel.value;
 
+        // Clear previous errors
+        clearAllFieldErrors();
+
         // Validation
+        let hasError = false;
+
         if (!site) {
-            alert('Please enter a site or app name.');
-            elements.site.focus();
-            return;
+            showFieldError(elements.site, elements.siteError, 'Please enter a site or app name.');
+            if (!hasError) {
+                elements.site.focus();
+                hasError = true;
+            }
         }
 
         if (!masterPhrase) {
-            alert('Please enter your master phrase.');
-            elements.masterPhrase.focus();
-            return;
+            showFieldError(elements.masterPhrase, elements.masterPhraseError, 'Please enter your master phrase.');
+            if (!hasError) {
+                elements.masterPhrase.focus();
+                hasError = true;
+            }
         }
 
         // Validate version is a positive integer
         const versionNum = parseInt(version, 10);
         if (isNaN(versionNum) || versionNum < 1) {
-            alert('Version must be a positive number (1 or greater).');
-            elements.version.focus();
+            showFieldError(elements.version, elements.versionError, 'Version must be 1 or greater.');
             elements.version.value = '1';
+            if (!hasError) {
+                elements.version.focus();
+                hasError = true;
+            }
+        }
+
+        if (hasError) {
             return;
         }
 
@@ -519,7 +583,8 @@
             elements.outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         } catch (error) {
-            alert('Error generating password: ' + error.message);
+            // Show error inline - most likely a character type issue
+            showFieldError(elements.site, elements.siteError, 'Error: ' + error.message);
         } finally {
             elements.generateBtn.disabled = false;
             elements.generateBtn.classList.remove('loading');
@@ -553,6 +618,9 @@
 
     function clearOutput() {
         elements.generatedPassword.value = '';
+        elements.generatedPassword.type = 'password'; // Reset to hidden
+        elements.toggleOutputVisibility.setAttribute('aria-label', 'Show generated password');
+        elements.outputEyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
         elements.outputSection.style.display = 'none';
         clearAutoClearTimer();
         updateAutoClearNotice();
@@ -642,6 +710,26 @@
             elements.lengthValue.textContent = this.value;
         });
 
+        // Clear field errors on input (real-time feedback)
+        elements.site.addEventListener('input', function() {
+            if (this.value.trim()) {
+                clearFieldError(elements.site, elements.siteError);
+            }
+        });
+
+        elements.masterPhrase.addEventListener('input', function() {
+            if (this.value) {
+                clearFieldError(elements.masterPhrase, elements.masterPhraseError);
+            }
+        });
+
+        elements.version.addEventListener('input', function() {
+            const val = parseInt(this.value, 10);
+            if (!isNaN(val) && val >= 1) {
+                clearFieldError(elements.version, elements.versionError);
+            }
+        });
+
         // Copy button
         elements.copyBtn.addEventListener('click', copyPassword);
 
@@ -655,10 +743,12 @@
         elements.toggleMasterVisibility.addEventListener('click', function() {
             const isPassword = elements.masterPhrase.type === 'password';
             elements.masterPhrase.type = isPassword ? 'text' : 'password';
-            // Update SVG icon
+            // Update aria-label and SVG icon
             if (isPassword) {
+                this.setAttribute('aria-label', 'Hide master phrase');
                 elements.eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
             } else {
+                this.setAttribute('aria-label', 'Show master phrase');
                 elements.eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
             }
         });
@@ -679,11 +769,37 @@
             elements.rememberWarning.style.display = 'none';
         });
 
-        // Accordion toggle
+        // Accordion toggles
         elements.howItWorksHeader.addEventListener('click', function() {
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !isExpanded);
             elements.howItWorksContent.classList.toggle('open');
+        });
+
+        elements.faqHeader.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            elements.faqContent.classList.toggle('open');
+        });
+
+        elements.securityHeader.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            elements.securityContent.classList.toggle('open');
+        });
+
+        // Output password visibility toggle
+        elements.toggleOutputVisibility.addEventListener('click', function() {
+            const isPassword = elements.generatedPassword.type === 'password';
+            elements.generatedPassword.type = isPassword ? 'text' : 'password';
+            // Update aria-label and icon
+            if (isPassword) {
+                this.setAttribute('aria-label', 'Hide generated password');
+                elements.outputEyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+            } else {
+                this.setAttribute('aria-label', 'Show generated password');
+                elements.outputEyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            }
         });
 
         // Character set validation - ensure at least one is selected
@@ -699,7 +815,9 @@
                 const anyChecked = charSetCheckboxes.some(cb => cb.checked);
                 if (!anyChecked) {
                     this.checked = true;
-                    alert('At least one character type must be selected.');
+                    // Show brief inline feedback (will auto-clear on next generation)
+                    showFieldError(elements.site, elements.siteError, 'At least one character type must be selected.');
+                    setTimeout(() => clearFieldError(elements.site, elements.siteError), 3000);
                 }
             });
         });

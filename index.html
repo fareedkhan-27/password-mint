@@ -62,9 +62,10 @@
                         placeholder="e.g., amazon, google.com"
                         autocomplete="off"
                         spellcheck="false"
-                        required
+                        aria-describedby="siteHint siteError"
                     >
-                    <small class="hint">"amazon", "Amazon.com", and "https://mail.amazon.com" all produce the same result</small>
+                    <small class="hint" id="siteHint">"amazon", "Amazon.com", and "https://mail.amazon.com" all produce the same result</small>
+                    <small class="field-error" id="siteError" role="alert" aria-live="polite"></small>
                 </div>
 
                 <!-- Master Phrase -->
@@ -77,16 +78,17 @@
                             placeholder="Your secret phrase"
                             autocomplete="off"
                             spellcheck="false"
-                            required
+                            aria-describedby="masterPhraseHint masterPhraseError"
                         >
-                        <button type="button" class="toggle-visibility" id="toggleMasterVisibility" aria-label="Show/hide master phrase">
+                        <button type="button" class="toggle-visibility" id="toggleMasterVisibility" aria-label="Show master phrase">
                             <svg class="eye-icon" id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                 <circle cx="12" cy="12" r="3"/>
                             </svg>
                         </button>
                     </div>
-                    <small class="hint">Use 4+ random words. Capitalization doesn't matter.</small>
+                    <small class="hint" id="masterPhraseHint">Use 4+ random words. Capitalization doesn't matter.</small>
+                    <small class="field-error" id="masterPhraseError" role="alert" aria-live="polite"></small>
                 </div>
 
                 <!-- Generate Button - Moved up for primary flow -->
@@ -126,9 +128,11 @@
                                     value="1"
                                     min="1"
                                     max="9999"
+                                    aria-describedby="versionHint versionError"
                                 >
-                                <small class="hint">Increment to rotate password</small>
+                                <small class="hint" id="versionHint">Increment to rotate password</small>
                             </div>
+                            <small class="field-error" id="versionError" role="alert" aria-live="polite"></small>
                         </div>
 
                         <!-- Length Slider -->
@@ -206,11 +210,17 @@
                 </div>
                 <div class="output-password-wrapper">
                     <input
-                        type="text"
+                        type="password"
                         id="generatedPassword"
                         readonly
                         aria-label="Generated password"
                     >
+                    <button type="button" class="toggle-visibility toggle-output-visibility" id="toggleOutputVisibility" aria-label="Show generated password">
+                        <svg class="eye-icon" id="outputEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
                 </div>
                 <button type="button" class="btn btn-copy" id="copyBtn">
                     <svg class="copy-icon" id="copyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -279,9 +289,76 @@
             </ul>
         </section>
 
-        <!-- FAQ Link -->
-        <section class="faq-link">
-            <a href="faq.md" target="_blank">Frequently Asked Questions →</a>
+        <!-- FAQ Section -->
+        <section class="accordion">
+            <button class="accordion-header" id="faqHeader" aria-expanded="false">
+                <span>Frequently Asked Questions</span>
+                <span class="accordion-icon">▼</span>
+            </button>
+            <div class="accordion-content" id="faqContent">
+                <div class="accordion-inner">
+                    <div class="faq-item">
+                        <h3>What is Password Mint?</h3>
+                        <p>A privacy-first password generator that creates unique, strong passwords for each site. Instead of storing passwords, it derives them mathematically from your master phrase and site name — regenerate any password anytime, without storing anything.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Is this a password manager?</h3>
+                        <p>No. Password managers store encrypted passwords and sync them. Password Mint stores nothing — it generates passwords on demand. Think of it as a mathematical recipe rather than a vault.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>What should my master phrase be?</h3>
+                        <p>Use 4+ random words (e.g., "purple elephant dances tuesday"). Avoid birthdays, names, song lyrics, or common phrases. The phrase should be unique and never used elsewhere.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Does capitalization matter?</h3>
+                        <p>No! Phrase hardening normalizes your input. "My Phrase", "my phrase", and "MY PHRASE" all produce the same password. Extra spaces are also ignored.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>How do I change a password?</h3>
+                        <p>Increment the Version field. Change from 1 to 2, generate the new password, update it on the site, and remember the new version number.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>What if I forget my master phrase?</h3>
+                        <p>There's no recovery option. You'll need to reset passwords on each site manually. This is the trade-off of zero-storage design.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Can I use this offline?</h3>
+                        <p>Yes! Download the files and use them without internet. It works identically online or offline.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Model Section -->
+        <section class="accordion">
+            <button class="accordion-header" id="securityHeader" aria-expanded="false">
+                <span>Security Model</span>
+                <span class="accordion-icon">▼</span>
+            </button>
+            <div class="accordion-content" id="securityContent">
+                <div class="accordion-inner">
+                    <div class="faq-item">
+                        <h3>How secure is this?</h3>
+                        <p>Password Mint uses PBKDF2-SHA256 with 210,000+ iterations (OWASP 2023 recommended). Security depends on your master phrase strength, device security, and behavior.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>What does it protect against?</h3>
+                        <p><strong>Protected:</strong> Password reuse, database breaches (passwords are unique per site), rainbow tables (site-specific salt), server compromise (no server exists), transit interception (no network requests).</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>What are the risks?</h3>
+                        <p><strong>Not protected:</strong> Master phrase compromise (attacker can regenerate all passwords), keyloggers/malware, phishing, weak master phrases. Treat your master phrase as your most important secret.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Why PBKDF2 instead of Argon2?</h3>
+                        <p>Argon2 requires external libraries. PBKDF2 is browser-native via Web Crypto API, requires zero dependencies, and meets OWASP security standards with sufficient iterations.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Can someone reverse my master phrase?</h3>
+                        <p>Not practically. PBKDF2 is a one-way function. Brute-forcing would require trying every possible phrase, which is computationally infeasible with a strong master phrase.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Footer -->
@@ -294,8 +371,6 @@
             </div>
             <p class="credits">
                 Built by <a href="https://www.linkedin.com/in/fareedkhankk" target="_blank">Fareed Khan</a>
-                <span class="separator">·</span>
-                <a href="security.md" target="_blank">Security</a>
                 <span class="separator">·</span>
                 <a href="https://github.com/fareedkhan-27/password-mint" target="_blank">Source</a>
                 <span class="separator">·</span>

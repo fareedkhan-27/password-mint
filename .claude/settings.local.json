@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial release of Password Mint\n\nA privacy-first, offline password generator that creates unique strong\npasswords per site — regenerable anytime using your private master phrase.\n\nFeatures:\n- 100% offline, no server calls\n- PBKDF2-SHA256 with 210,000+ iterations\n- Phrase hardening for input consistency\n- Site normalization for URL flexibility\n- No storage, no tracking, no analytics\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nSimplify security tips messaging\n\nRemove discouraging statements that undermined confidence in the tool.\nReplace with positive, empowering guidance.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+    ]
+  }
+}

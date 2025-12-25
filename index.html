@@ -12,10 +12,33 @@
     <div class="container">
         <!-- Trust Bar -->
         <div class="trust-bar">
-            <span class="trust-item"><span class="check">✓</span> Works offline</span>
-            <span class="trust-item"><span class="check">✓</span> Stores nothing by default</span>
-            <span class="trust-item"><span class="check">✓</span> No trackers</span>
-            <span class="trust-item"><span class="check">✓</span> Open-source ready</span>
+            <span class="trust-item">
+                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18.36 6.64A9 9 0 0 1 20.77 15M5.64 6.64A9 9 0 0 0 3.23 15"/>
+                    <path d="M15.54 9.46A5 5 0 0 1 17.66 15M8.46 9.46A5 5 0 0 0 6.34 15"/>
+                    <circle cx="12" cy="15" r="1"/>
+                </svg>
+                Offline-first
+            </span>
+            <span class="trust-item">
+                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Zero storage
+            </span>
+            <span class="trust-item">
+                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                No tracking
+            </span>
+            <span class="trust-item">
+                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
+                </svg>
+                Open source
+            </span>
         </div>
 
         <!-- Header -->
@@ -27,171 +50,201 @@
             <p class="tagline">Fresh, strong passwords — generated on demand, remembered by math.</p>
         </header>
 
-        <!-- Holiday Banner (Optional) -->
-        <div class="holiday-banner" id="holidayBanner" style="display: none;">
-            <span>🎁 Holiday gift to my network: safer passwords, made simple.</span>
-            <button class="banner-close" id="closeBanner" aria-label="Close banner">×</button>
-        </div>
-        <label class="holiday-toggle">
-            <input type="checkbox" id="showHolidayBanner">
-            <span>Show holiday message</span>
-        </label>
-
         <!-- Main Card -->
         <main class="card">
             <form id="passwordForm" autocomplete="off">
                 <!-- Site Input -->
-                <div class="form-group">
+                <div class="form-group form-group-primary">
                     <label for="site">Site or App</label>
                     <input
                         type="text"
                         id="site"
-                        placeholder="e.g., apple, google.com, https://github.com"
+                        placeholder="e.g., amazon, google.com"
                         autocomplete="off"
                         spellcheck="false"
                         required
                     >
-                    <small class="hint">Enter a website or app name. Site normalization ensures "GitHub.com" and "github" produce the same result.</small>
+                    <small class="hint">"GitHub.com" and "github" produce the same result</small>
                 </div>
 
                 <!-- Master Phrase -->
-                <div class="form-group">
+                <div class="form-group form-group-primary">
                     <label for="masterPhrase">Master Phrase</label>
                     <div class="input-with-toggle">
                         <input
                             type="password"
                             id="masterPhrase"
-                            placeholder="Your secret phrase (never stored)"
+                            placeholder="Your secret phrase"
                             autocomplete="off"
                             spellcheck="false"
                             required
                         >
                         <button type="button" class="toggle-visibility" id="toggleMasterVisibility" aria-label="Show/hide master phrase">
-                            <span class="eye-icon" id="eyeIcon">👁</span>
+                            <svg class="eye-icon" id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
                         </button>
                     </div>
-                    <small class="hint">Type naturally — we apply phrase hardening (normalization + deterministic transformation) so "My Phrase" and "my phrase" produce the same result. Still, choose a strong, unique phrase — avoid common phrases, lyrics, or personal info.</small>
+                    <small class="hint">Use 4+ random words. Capitalization doesn't matter.</small>
                 </div>
 
-                <!-- Remember Master Phrase (OFF by default) -->
-                <div class="form-group remember-section">
-                    <label class="checkbox-label warning-checkbox">
-                        <input type="checkbox" id="rememberPhrase">
-                        <span>Remember master phrase for this session</span>
-                    </label>
-                    <div class="warning-box" id="rememberWarning" style="display: none;">
-                        <strong>⚠️ Warning:</strong> Your phrase will be kept in memory until you close this tab or click "Forget Now". Only use on trusted devices.
-                        <button type="button" class="btn btn-small btn-danger" id="forgetNow">Forget Now</button>
-                    </div>
-                </div>
-
-                <!-- Version -->
-                <div class="form-group">
-                    <label for="version">Version</label>
-                    <input
-                        type="number"
-                        id="version"
-                        value="1"
-                        min="1"
-                        max="9999"
-                    >
-                    <small class="hint">Increment this to rotate your password for a site.</small>
-                </div>
-
-                <!-- Length Slider -->
-                <div class="form-group">
-                    <label for="length">Password Length: <span id="lengthValue">16</span></label>
-                    <input
-                        type="range"
-                        id="length"
-                        min="12"
-                        max="64"
-                        value="16"
-                    >
-                    <div class="range-labels">
-                        <span>12</span>
-                        <span>64</span>
-                    </div>
-                </div>
-
-                <!-- Character Options -->
-                <div class="form-group">
-                    <label>Character Sets</label>
-                    <div class="toggle-grid">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="useUpper" checked>
-                            <span>Uppercase (A-Z)</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="useLower" checked>
-                            <span>Lowercase (a-z)</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="useDigits" checked>
-                            <span>Digits (0-9)</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="useSymbols" checked>
-                            <span>Symbols (!@#$...)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Exclusion Options -->
-                <div class="form-group">
-                    <label>Exclusions</label>
-                    <div class="toggle-grid">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="excludeAmbiguous" checked>
-                            <span>Exclude ambiguous (O/0, I/l/1)</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="excludeProblematic" checked>
-                            <span>Exclude policy-problem chars (" ' \ ` space)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Security Level -->
-                <div class="form-group">
-                    <label for="securityLevel">Security Level</label>
-                    <select id="securityLevel">
-                        <option value="standard" selected>Standard (~210,000 iterations)</option>
-                        <option value="high">High (~400,000 iterations)</option>
-                    </select>
-                    <small class="hint">Higher = more secure but slower. Standard is recommended for most users.</small>
-                </div>
-
-                <!-- Generate Button -->
+                <!-- Generate Button - Moved up for primary flow -->
                 <button type="submit" class="btn btn-primary btn-large" id="generateBtn">
-                    Generate Password
+                    <span class="btn-text">Generate Password</span>
+                    <span class="btn-loader"></span>
                 </button>
+
+                <!-- Advanced Options - Collapsed by default -->
+                <details class="advanced-options" id="advancedOptions">
+                    <summary>
+                        <span>Advanced Options</span>
+                        <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </summary>
+                    <div class="advanced-options-content">
+                        <!-- Remember Master Phrase -->
+                        <div class="form-group remember-section">
+                            <label class="checkbox-label warning-checkbox">
+                                <input type="checkbox" id="rememberPhrase">
+                                <span>Remember phrase for this session</span>
+                            </label>
+                            <div class="warning-box" id="rememberWarning" style="display: none;">
+                                <span>Phrase kept in memory until tab closes.</span>
+                                <button type="button" class="btn btn-small btn-ghost" id="forgetNow">Forget</button>
+                            </div>
+                        </div>
+
+                        <!-- Version -->
+                        <div class="form-group">
+                            <label for="version">Version</label>
+                            <div class="version-input-wrapper">
+                                <input
+                                    type="number"
+                                    id="version"
+                                    value="1"
+                                    min="1"
+                                    max="9999"
+                                >
+                                <small class="hint">Increment to rotate password</small>
+                            </div>
+                        </div>
+
+                        <!-- Length Slider -->
+                        <div class="form-group">
+                            <label for="length">Length: <span id="lengthValue">16</span> characters</label>
+                            <div class="range-wrapper">
+                                <input
+                                    type="range"
+                                    id="length"
+                                    min="12"
+                                    max="64"
+                                    value="16"
+                                >
+                                <div class="range-labels">
+                                    <span>12</span>
+                                    <span>64</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Character Options -->
+                        <div class="form-group">
+                            <label>Character Sets</label>
+                            <div class="toggle-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="useUpper" checked>
+                                    <span>A-Z</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="useLower" checked>
+                                    <span>a-z</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="useDigits" checked>
+                                    <span>0-9</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="useSymbols" checked>
+                                    <span>!@#$</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Exclusion Options -->
+                        <div class="form-group">
+                            <label>Exclude</label>
+                            <div class="toggle-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="excludeAmbiguous" checked>
+                                    <span>Similar chars (O/0, l/1)</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="excludeProblematic" checked>
+                                    <span>Problem chars (" ' \)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Security Level -->
+                        <div class="form-group">
+                            <label for="securityLevel">Security Level</label>
+                            <select id="securityLevel">
+                                <option value="standard" selected>Standard (210k iterations)</option>
+                                <option value="high">High (400k iterations)</option>
+                            </select>
+                        </div>
+                    </div>
+                </details>
             </form>
 
             <!-- Output Section -->
             <div class="output-section" id="outputSection" style="display: none;">
-                <label for="generatedPassword">Your Generated Password</label>
-                <div class="output-field">
+                <div class="output-header">
+                    <svg class="output-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span>Password Generated</span>
+                </div>
+                <div class="output-password-wrapper">
                     <input
                         type="text"
                         id="generatedPassword"
                         readonly
                         aria-label="Generated password"
                     >
-                    <button type="button" class="btn btn-icon" id="copyBtn" aria-label="Copy password">
-                        <span id="copyIcon">📋</span>
-                    </button>
+                </div>
+                <button type="button" class="btn btn-copy" id="copyBtn">
+                    <svg class="copy-icon" id="copyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span class="copy-text">Copy to Clipboard</span>
+                </button>
+                <div class="output-meta">
+                    <span class="normalized-site" id="normalizedDisplay">
+                        Site: <code id="normalizedSite"></code>
+                    </span>
+                    <span class="auto-clear-notice" id="autoClearNotice">Auto-clears in 5 min</span>
                 </div>
                 <div class="output-actions">
-                    <button type="button" class="btn btn-secondary" id="regenerateBtn">Regenerate</button>
-                    <button type="button" class="btn btn-ghost" id="clearAllBtn">Clear All</button>
+                    <button type="button" class="btn btn-ghost" id="regenerateBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        Regenerate
+                    </button>
+                    <button type="button" class="btn btn-ghost" id="clearAllBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        Clear
+                    </button>
                 </div>
-                <small class="auto-clear-notice" id="autoClearNotice">Password will auto-clear after 5 minutes of inactivity.</small>
-            </div>
-
-            <!-- Normalized Site Display -->
-            <div class="normalized-display" id="normalizedDisplay" style="display: none;">
-                <small>Normalized site: <code id="normalizedSite"></code></small>
             </div>
         </main>
 
@@ -235,14 +288,20 @@
             <a href="faq.md" target="_blank">Frequently Asked Questions →</a>
         </section>
 
-        <!-- Privacy Note -->
+        <!-- Footer -->
         <footer class="footer">
-            <p class="privacy-note">🔒 <strong>Privacy note:</strong> No data leaves your device. Ever.</p>
+            <div class="privacy-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span>No data leaves your device. Ever.</span>
+            </div>
             <p class="credits">
-                Built with care.
-                <a href="security.md" target="_blank">Security Model</a> ·
-                <a href="https://github.com" target="_blank">View Source</a> ·
-                <a href="LICENSE" target="_blank">MIT License</a>
+                <a href="security.md" target="_blank">Security</a>
+                <span class="separator">·</span>
+                <a href="https://github.com/fareedkhan-27/password-mint" target="_blank">Source</a>
+                <span class="separator">·</span>
+                <a href="LICENSE" target="_blank">MIT</a>
             </p>
         </footer>
     </div>

@@ -76,9 +76,8 @@
         autoClearNotice: document.getElementById('autoClearNotice'),
         howItWorksHeader: document.getElementById('howItWorksHeader'),
         howItWorksContent: document.getElementById('howItWorksContent'),
-        holidayBanner: document.getElementById('holidayBanner'),
-        showHolidayBanner: document.getElementById('showHolidayBanner'),
-        closeBanner: document.getElementById('closeBanner')
+        advancedOptions: document.getElementById('advancedOptions'),
+        copyText: document.querySelector('.copy-text')
     };
 
     // =========================================================================
@@ -430,9 +429,8 @@
         const iterations = CONFIG.ITERATIONS[securityLevel] || CONFIG.ITERATIONS.standard;
 
         // Show generating state
-        elements.generateBtn.textContent = 'Generating...';
         elements.generateBtn.disabled = true;
-        elements.generateBtn.classList.add('generating');
+        elements.generateBtn.classList.add('loading');
 
         try {
             // Derive bytes using PBKDF2 with hardened phrase
@@ -444,7 +442,6 @@
             // Display result
             elements.generatedPassword.value = password;
             elements.outputSection.style.display = 'block';
-            elements.normalizedDisplay.style.display = 'block';
             elements.normalizedSite.textContent = normalizedSite;
 
             // Remember phrase if option is enabled
@@ -466,9 +463,8 @@
         } catch (error) {
             alert('Error generating password: ' + error.message);
         } finally {
-            elements.generateBtn.textContent = 'Generate Password';
             elements.generateBtn.disabled = false;
-            elements.generateBtn.classList.remove('generating');
+            elements.generateBtn.classList.remove('loading');
         }
     }
 
@@ -500,7 +496,6 @@
     function clearOutput() {
         elements.generatedPassword.value = '';
         elements.outputSection.style.display = 'none';
-        elements.normalizedDisplay.style.display = 'none';
         clearAutoClearTimer();
         updateAutoClearNotice();
     }
@@ -539,12 +534,18 @@
             await navigator.clipboard.writeText(password);
 
             // Visual feedback
-            elements.copyIcon.textContent = '✓';
-            elements.copyBtn.classList.add('copy-success');
+            elements.copyBtn.classList.add('copied');
+            if (elements.copyText) {
+                elements.copyText.textContent = 'Copied!';
+            }
+            elements.copyIcon.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
 
             setTimeout(() => {
-                elements.copyIcon.textContent = '📋';
-                elements.copyBtn.classList.remove('copy-success');
+                elements.copyBtn.classList.remove('copied');
+                if (elements.copyText) {
+                    elements.copyText.textContent = 'Copy to Clipboard';
+                }
+                elements.copyIcon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
             }, 2000);
 
             // Reset auto-clear timer on interaction
@@ -554,9 +555,15 @@
             // Fallback for older browsers
             elements.generatedPassword.select();
             document.execCommand('copy');
-            elements.copyIcon.textContent = '✓';
+            elements.copyBtn.classList.add('copied');
+            if (elements.copyText) {
+                elements.copyText.textContent = 'Copied!';
+            }
             setTimeout(() => {
-                elements.copyIcon.textContent = '📋';
+                elements.copyBtn.classList.remove('copied');
+                if (elements.copyText) {
+                    elements.copyText.textContent = 'Copy to Clipboard';
+                }
             }, 2000);
         }
     }
@@ -590,7 +597,12 @@
         elements.toggleMasterVisibility.addEventListener('click', function() {
             const isPassword = elements.masterPhrase.type === 'password';
             elements.masterPhrase.type = isPassword ? 'text' : 'password';
-            elements.eyeIcon.textContent = isPassword ? '🙈' : '👁';
+            // Update SVG icon
+            if (isPassword) {
+                elements.eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+            } else {
+                elements.eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            }
         });
 
         // Remember phrase toggle
@@ -614,17 +626,6 @@
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !isExpanded);
             elements.howItWorksContent.classList.toggle('open');
-        });
-
-        // Holiday banner toggle
-        elements.showHolidayBanner.addEventListener('change', function() {
-            elements.holidayBanner.style.display = this.checked ? 'flex' : 'none';
-        });
-
-        // Close holiday banner
-        elements.closeBanner.addEventListener('click', function() {
-            elements.holidayBanner.style.display = 'none';
-            elements.showHolidayBanner.checked = false;
         });
 
         // Character set validation - ensure at least one is selected

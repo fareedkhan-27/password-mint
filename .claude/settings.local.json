@@ -9,7 +9,9 @@
       "Bash(git branch:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nSimplify security tips messaging\n\nRemove discouraging statements that undermined confidence in the tool.\nReplace with positive, empowering guidance.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nSimplify security tips messaging\n\nRemove discouraging statements that undermined confidence in the tool.\nReplace with positive, empowering guidance.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\nRedesign UI for premium, calm, trust-driven experience\n\nMajor UX improvements:\n- Remove holiday toggle for cleaner interface\n- Collapse advanced options by default (reduces cognitive load)\n- Move Generate button higher in form for faster primary action\n- Simplify hints to essential information only\n\nVisual design updates:\n- Soften trust bar with subtle icons instead of bold checkmarks\n- Warmer color palette with refined mint tones\n- Premium card shadows and subtle borders\n- Staggered page load animations for polish\n- Dark password display with mint text for emphasis\n\nImproved interactions:\n- Loading spinner on generate button\n- Better copy button with text label and checkmark feedback\n- SVG icons throughout for crisp rendering\n- Improved checkbox styling with visual selected states\n\nMobile & accessibility:\n- Larger tap targets on mobile\n- Better focus states\n- Reduced motion support\n- Print styles\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)"
     ]
   }
 }

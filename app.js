@@ -96,9 +96,18 @@
      * - Trims whitespace
      * - Converts to lowercase
      * - Removes protocol (http/https)
-     * - Removes path, query, fragment
-     * - Keeps hostname only
-     * - If no dots present, keeps as-is (e.g., "apple" stays "apple")
+     * - Removes www. prefix
+     * - Removes path, query, fragment, port
+     * - Extracts base domain name (strips common TLDs)
+     *
+     * Examples:
+     *   "Yahoo" → "yahoo"
+     *   "yahoo.com" → "yahoo"
+     *   "YAHOO.COM" → "yahoo"
+     *   "https://www.yahoo.com/mail" → "yahoo"
+     *   "mail.yahoo.com" → "mail.yahoo" (subdomain preserved)
+     *   "GitHub.com" → "github"
+     *   "github" → "github"
      */
     function normalizeSite(input) {
         let site = input.trim().toLowerCase();
@@ -109,14 +118,53 @@
         // Remove www. prefix
         site = site.replace(/^www\./, '');
 
-        // If it looks like a URL (has dots), extract just the hostname
-        if (site.includes('.') || site.includes('/')) {
+        // If it looks like a URL (has path, query, fragment, or port)
+        if (site.includes('/') || site.includes('?') || site.includes('#') || site.includes(':')) {
             // Remove path, query, fragment
             site = site.split('/')[0];
             site = site.split('?')[0];
             site = site.split('#')[0];
             // Remove port if present
             site = site.split(':')[0];
+        }
+
+        // Common TLDs to strip (single-level TLDs)
+        const commonTLDs = [
+            '.com', '.org', '.net', '.edu', '.gov', '.io', '.co', '.app',
+            '.dev', '.ai', '.me', '.tv', '.info', '.biz', '.xyz', '.online',
+            '.site', '.tech', '.store', '.shop', '.blog', '.cloud', '.pro'
+        ];
+
+        // Common country-code TLDs
+        const countryTLDs = [
+            '.uk', '.us', '.ca', '.au', '.de', '.fr', '.jp', '.cn', '.in',
+            '.br', '.ru', '.it', '.es', '.nl', '.se', '.no', '.dk', '.fi',
+            '.pl', '.be', '.at', '.ch', '.nz', '.ie', '.sg', '.hk', '.kr'
+        ];
+
+        // Common compound TLDs (country + type)
+        const compoundTLDs = [
+            '.co.uk', '.co.in', '.co.jp', '.co.nz', '.co.za', '.co.kr',
+            '.com.au', '.com.br', '.com.mx', '.com.sg', '.com.hk',
+            '.org.uk', '.net.au', '.ac.uk', '.gov.uk', '.edu.au'
+        ];
+
+        // First check compound TLDs (longer matches first)
+        for (const tld of compoundTLDs) {
+            if (site.endsWith(tld)) {
+                site = site.slice(0, -tld.length);
+                break;
+            }
+        }
+
+        // Then check single TLDs if no compound was found
+        if (site.includes('.')) {
+            for (const tld of [...commonTLDs, ...countryTLDs]) {
+                if (site.endsWith(tld)) {
+                    site = site.slice(0, -tld.length);
+                    break;
+                }
+            }
         }
 
         return site;

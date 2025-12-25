@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Password Mint - A privacy-first, offline password generator. Create unique strong passwords per site, regenerable anytime. Nothing stored, nothing sent.">
+    <meta name="theme-color" content="#10b981">
+    <title>Password Mint - Privacy-First Password Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Trust Bar -->
+        <div class="trust-bar">
+            <span class="trust-item"><span class="check">✓</span> Works offline</span>
+            <span class="trust-item"><span class="check">✓</span> Stores nothing by default</span>
+            <span class="trust-item"><span class="check">✓</span> No trackers</span>
+            <span class="trust-item"><span class="check">✓</span> Open-source ready</span>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">
+                <span class="logo-icon">🔐</span>
+                Password Mint
+            </h1>
+            <p class="tagline">Fresh, strong passwords — generated on demand, remembered by math.</p>
+        </header>
+
+        <!-- Holiday Banner (Optional) -->
+        <div class="holiday-banner" id="holidayBanner" style="display: none;">
+            <span>🎁 Holiday gift to my network: safer passwords, made simple.</span>
+            <button class="banner-close" id="closeBanner" aria-label="Close banner">×</button>
+        </div>
+        <label class="holiday-toggle">
+            <input type="checkbox" id="showHolidayBanner">
+            <span>Show holiday message</span>
+        </label>
+
+        <!-- Main Card -->
+        <main class="card">
+            <form id="passwordForm" autocomplete="off">
+                <!-- Site Input -->
+                <div class="form-group">
+                    <label for="site">Site or App</label>
+                    <input
+                        type="text"
+                        id="site"
+                        placeholder="e.g., apple, google.com, https://github.com"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
+                    >
+                    <small class="hint">Enter a website or app name. Site normalization ensures "GitHub.com" and "github" produce the same result.</small>
+                </div>
+
+                <!-- Master Phrase -->
+                <div class="form-group">
+                    <label for="masterPhrase">Master Phrase</label>
+                    <div class="input-with-toggle">
+                        <input
+                            type="password"
+                            id="masterPhrase"
+                            placeholder="Your secret phrase (never stored)"
+                            autocomplete="off"
+                            spellcheck="false"
+                            required
+                        >
+                        <button type="button" class="toggle-visibility" id="toggleMasterVisibility" aria-label="Show/hide master phrase">
+                            <span class="eye-icon" id="eyeIcon">👁</span>
+                        </button>
+                    </div>
+                    <small class="hint">Type naturally — we apply phrase hardening (normalization + deterministic transformation) so "My Phrase" and "my phrase" produce the same result. Still, choose a strong, unique phrase — avoid common phrases, lyrics, or personal info.</small>
+                </div>
+
+                <!-- Remember Master Phrase (OFF by default) -->
+                <div class="form-group remember-section">
+                    <label class="checkbox-label warning-checkbox">
+                        <input type="checkbox" id="rememberPhrase">
+                        <span>Remember master phrase for this session</span>
+                    </label>
+                    <div class="warning-box" id="rememberWarning" style="display: none;">
+                        <strong>⚠️ Warning:</strong> Your phrase will be kept in memory until you close this tab or click "Forget Now". Only use on trusted devices.
+                        <button type="button" class="btn btn-small btn-danger" id="forgetNow">Forget Now</button>
+                    </div>
+                </div>
+
+                <!-- Version -->
+                <div class="form-group">
+                    <label for="version">Version</label>
+                    <input
+                        type="number"
+                        id="version"
+                        value="1"
+                        min="1"
+                        max="9999"
+                    >
+                    <small class="hint">Increment this to rotate your password for a site.</small>
+                </div>
+
+                <!-- Length Slider -->
+                <div class="form-group">
+                    <label for="length">Password Length: <span id="lengthValue">16</span></label>
+                    <input
+                        type="range"
+                        id="length"
+                        min="12"
+                        max="64"
+                        value="16"
+                    >
+                    <div class="range-labels">
+                        <span>12</span>
+                        <span>64</span>
+                    </div>
+                </div>
+
+                <!-- Character Options -->
+                <div class="form-group">
+                    <label>Character Sets</label>
+                    <div class="toggle-grid">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="useUpper" checked>
+                            <span>Uppercase (A-Z)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="useLower" checked>
+                            <span>Lowercase (a-z)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="useDigits" checked>
+                            <span>Digits (0-9)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="useSymbols" checked>
+                            <span>Symbols (!@#$...)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Exclusion Options -->
+                <div class="form-group">
+                    <label>Exclusions</label>
+                    <div class="toggle-grid">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="excludeAmbiguous" checked>
+                            <span>Exclude ambiguous (O/0, I/l/1)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="excludeProblematic" checked>
+                            <span>Exclude policy-problem chars (" ' \ ` space)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Security Level -->
+                <div class="form-group">
+                    <label for="securityLevel">Security Level</label>
+                    <select id="securityLevel">
+                        <option value="standard" selected>Standard (~210,000 iterations)</option>
+                        <option value="high">High (~400,000 iterations)</option>
+                    </select>
+                    <small class="hint">Higher = more secure but slower. Standard is recommended for most users.</small>
+                </div>
+
+                <!-- Generate Button -->
+                <button type="submit" class="btn btn-primary btn-large" id="generateBtn">
+                    Generate Password
+                </button>
+            </form>
+
+            <!-- Output Section -->
+            <div class="output-section" id="outputSection" style="display: none;">
+                <label for="generatedPassword">Your Generated Password</label>
+                <div class="output-field">
+                    <input
+                        type="text"
+                        id="generatedPassword"
+                        readonly
+                        aria-label="Generated password"
+                    >
+                    <button type="button" class="btn btn-icon" id="copyBtn" aria-label="Copy password">
+                        <span id="copyIcon">📋</span>
+                    </button>
+                </div>
+                <div class="output-actions">
+                    <button type="button" class="btn btn-secondary" id="regenerateBtn">Regenerate</button>
+                    <button type="button" class="btn btn-ghost" id="clearAllBtn">Clear All</button>
+                </div>
+                <small class="auto-clear-notice" id="autoClearNotice">Password will auto-clear after 5 minutes of inactivity.</small>
+            </div>
+
+            <!-- Normalized Site Display -->
+            <div class="normalized-display" id="normalizedDisplay" style="display: none;">
+                <small>Normalized site: <code id="normalizedSite"></code></small>
+            </div>
+        </main>
+
+        <!-- How It Works Accordion -->
+        <section class="accordion">
+            <button class="accordion-header" id="howItWorksHeader" aria-expanded="false">
+                <span>How It Works</span>
+                <span class="accordion-icon">▼</span>
+            </button>
+            <div class="accordion-content" id="howItWorksContent">
+                <div class="accordion-inner">
+                    <h3>The Simple Version</h3>
+                    <p>Password Mint uses your master phrase and the site name to mathematically generate a unique password. The same inputs always produce the same output — like a secret recipe only you know.</p>
+
+                    <h3>The Technical Version</h3>
+                    <ol>
+                        <li><strong>Site normalization:</strong> We clean up the URL (remove https://, www., paths, query strings) and lowercase it to ensure consistency.</li>
+                        <li><strong>Phrase hardening (deterministic transformation):</strong> We normalize your input (trim, lowercase, collapse spaces), then deterministically capitalize 1-2 words and append a symbol+digit+symbol suffix. This means "My Phrase" and "my phrase" become identical internally, but the final hardened form is more complex.</li>
+                        <li><strong>Salt construction:</strong> We combine a fixed prefix, the normalized site, and your version number for rotation.</li>
+                        <li><strong>Key derivation:</strong> Using PBKDF2 with SHA-256 and 210,000+ iterations, we derive 64 bytes from your hardened phrase and salt.</li>
+                        <li><strong>Password generation:</strong> We map those bytes to your chosen character sets, ensuring at least one character from each selected type, then shuffle deterministically.</li>
+                    </ol>
+                    <p><strong>Result:</strong> A strong, unique password that can be regenerated anytime with the same inputs. Phrase hardening improves consistency, but you must still choose a strong, unique master phrase — avoid common phrases, song lyrics, or personal info.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Tips -->
+        <section class="tips-section">
+            <h2>Security Tips</h2>
+            <ul class="tips-list">
+                <li><strong>Choose a strong, unique master phrase.</strong> Use 4+ random words (e.g., "purple elephant dances tuesday"). Avoid common phrases, song lyrics, quotes, or personal info (names, birthdays).</li>
+                <li><strong>Phrase hardening helps with consistency.</strong> We normalize and transform your input, so "My Phrase" and "my phrase" produce the same result — but hardening does NOT make a weak phrase strong.</li>
+                <li><strong>Don't reuse your master phrase elsewhere.</strong> It should be unique to Password Mint.</li>
+                <li><strong>Use the Version field for rotation.</strong> If a password is compromised, increment the version for that site to generate a new one.</li>
+                <li><strong>For maximum safety,</strong> consider using a full-featured password manager alongside this tool.</li>
+            </ul>
+        </section>
+
+        <!-- FAQ Link -->
+        <section class="faq-link">
+            <a href="faq.md" target="_blank">Frequently Asked Questions →</a>
+        </section>
+
+        <!-- Privacy Note -->
+        <footer class="footer">
+            <p class="privacy-note">🔒 <strong>Privacy note:</strong> No data leaves your device. Ever.</p>
+            <p class="credits">
+                Built with care.
+                <a href="security.md" target="_blank">Security Model</a> ·
+                <a href="https://github.com" target="_blank">View Source</a> ·
+                <a href="LICENSE" target="_blank">MIT License</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

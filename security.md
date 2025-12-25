@@ -213,4 +213,4 @@ The tool will work identically online or offline.
 
 ## Responsible Disclosure
 
-If you discover a security vulnerability, please email [your-email@example.com] rather than opening a public issue.
+If you discover a security vulnerability, please email [fareedkhan27@gmail.com](mailto:fareedkhan27@gmail.com) rather than opening a public issue.

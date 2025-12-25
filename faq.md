@@ -226,6 +226,6 @@ The code is simple, auditable, and uses standard crypto primitives. However:
 
 ## Contact
 
-For questions, open an issue on GitHub or email [your-email@example.com].
+For questions, open an issue on GitHub or email [fareedkhan27@gmail.com](mailto:fareedkhan27@gmail.com).
 
 For security vulnerabilities, please email directly rather than opening a public issue.

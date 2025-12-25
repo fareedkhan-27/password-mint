@@ -28,18 +28,22 @@
     };
 
     // Character sets
+    // Symbols chosen for maximum compatibility across major sites:
+    // Amazon, Apple, Google, Microsoft, Netflix, Facebook, Instagram, banking sites
+    // Avoided: ~ | \ " ' ` < > [ ] { } ; : , / & ^ (commonly restricted)
     const CHAR_SETS = {
         upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         lower: 'abcdefghijklmnopqrstuvwxyz',
         digits: '0123456789',
-        symbols: '!@#$%^&*()-_=+[]{}|;:,.<>?/'
+        symbols: '!@#$%*-_=+.?'  // Safe symbols that work on 95%+ of sites
     };
 
     // Ambiguous characters to exclude
     const AMBIGUOUS_CHARS = 'O0Il1';
 
     // Policy-problem characters (often rejected by password policies)
-    const PROBLEMATIC_CHARS = '"\' \\`';
+    // Note: Many of these are already excluded from symbols above
+    const PROBLEMATIC_CHARS = '"\' \\`~|<>[]{}:;,/&^()';
 
     // =========================================================================
     // DOM ELEMENTS
@@ -57,7 +61,6 @@
         useDigits: document.getElementById('useDigits'),
         useSymbols: document.getElementById('useSymbols'),
         excludeAmbiguous: document.getElementById('excludeAmbiguous'),
-        excludeProblematic: document.getElementById('excludeProblematic'),
         securityLevel: document.getElementById('securityLevel'),
         generateBtn: document.getElementById('generateBtn'),
         outputSection: document.getElementById('outputSection'),
@@ -96,7 +99,7 @@
      * - Trims whitespace
      * - Converts to lowercase
      * - Removes protocol (http/https)
-     * - Removes www. prefix
+     * - Removes common subdomains (www, mail, m, app, etc.)
      * - Removes path, query, fragment, port
      * - Extracts base domain name (strips common TLDs)
      *
@@ -105,9 +108,10 @@
      *   "yahoo.com" → "yahoo"
      *   "YAHOO.COM" → "yahoo"
      *   "https://www.yahoo.com/mail" → "yahoo"
-     *   "mail.yahoo.com" → "mail.yahoo" (subdomain preserved)
+     *   "mail.yahoo.com" → "yahoo" (common subdomain stripped)
      *   "GitHub.com" → "github"
      *   "github" → "github"
+     *   "m.facebook.com" → "facebook"
      */
     function normalizeSite(input) {
         let site = input.trim().toLowerCase();
@@ -115,8 +119,8 @@
         // Remove protocol
         site = site.replace(/^https?:\/\//, '');
 
-        // Remove www. prefix
-        site = site.replace(/^www\./, '');
+        // Remove common subdomains (www, mail, m, app, etc.)
+        site = site.replace(/^(www|mail|m|app|mobile|login|signin|auth|account|accounts|my|portal|secure|api|cdn|static|assets|media|images|img|files|docs|help|support)\./, '');
 
         // If it looks like a URL (has path, query, fragment, or port)
         if (site.includes('/') || site.includes('?') || site.includes('#') || site.includes(':')) {
@@ -132,14 +136,18 @@
         const commonTLDs = [
             '.com', '.org', '.net', '.edu', '.gov', '.io', '.co', '.app',
             '.dev', '.ai', '.me', '.tv', '.info', '.biz', '.xyz', '.online',
-            '.site', '.tech', '.store', '.shop', '.blog', '.cloud', '.pro'
+            '.site', '.tech', '.store', '.shop', '.blog', '.cloud', '.pro',
+            '.to', '.ly', '.gg', '.fm', '.cc', '.ws', '.vc', '.la', '.link',
+            '.live', '.world', '.space', '.fun', '.one', '.network', '.social'
         ];
 
         // Common country-code TLDs
         const countryTLDs = [
             '.uk', '.us', '.ca', '.au', '.de', '.fr', '.jp', '.cn', '.in',
             '.br', '.ru', '.it', '.es', '.nl', '.se', '.no', '.dk', '.fi',
-            '.pl', '.be', '.at', '.ch', '.nz', '.ie', '.sg', '.hk', '.kr'
+            '.pl', '.be', '.at', '.ch', '.nz', '.ie', '.sg', '.hk', '.kr',
+            '.za', '.mx', '.ar', '.cl', '.pe', '.co', '.ve', '.my', '.ph',
+            '.id', '.th', '.vn', '.tw', '.tr', '.ae', '.sa', '.eg', '.il'
         ];
 
         // Common compound TLDs (country + type)
@@ -167,6 +175,11 @@
             }
         }
 
+        // Safety: if normalization resulted in empty string, return original (trimmed, lowercased)
+        if (!site) {
+            site = input.trim().toLowerCase();
+        }
+
         return site;
     }
 
@@ -185,13 +198,6 @@
         if (elements.excludeAmbiguous.checked) {
             for (const char of AMBIGUOUS_CHARS) {
                 pool = pool.replace(new RegExp(char, 'g'), '');
-            }
-        }
-
-        // Remove problematic characters if selected
-        if (elements.excludeProblematic.checked) {
-            for (const char of PROBLEMATIC_CHARS) {
-                pool = pool.replace(new RegExp('\\' + char, 'g'), '');
             }
         }
 
@@ -229,12 +235,7 @@
         }
 
         if (elements.useSymbols.checked) {
-            let pool = CHAR_SETS.symbols;
-            if (elements.excludeProblematic.checked) {
-                for (const char of PROBLEMATIC_CHARS) {
-                    pool = pool.replace(new RegExp('\\' + char, 'g'), '');
-                }
-            }
+            const pool = CHAR_SETS.symbols;
             if (pool.length > 0) pools.push({ type: 'symbols', chars: pool });
         }
 
@@ -461,6 +462,15 @@
         if (!masterPhrase) {
             alert('Please enter your master phrase.');
             elements.masterPhrase.focus();
+            return;
+        }
+
+        // Validate version is a positive integer
+        const versionNum = parseInt(version, 10);
+        if (isNaN(versionNum) || versionNum < 1) {
+            alert('Version must be a positive number (1 or greater).');
+            elements.version.focus();
+            elements.version.value = '1';
             return;
         }
 
